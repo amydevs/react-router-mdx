@@ -72,10 +72,11 @@ Finally, create the [Route Module](https://reactrouter.com/start/framework/route
 
 ```ts
 import { useMdxComponent, useMdxAttributes } from 'react-router-mdx/client'
-import { loadMdx } from 'react-router-mdx/server'
 import type { Route } from "./+types/post";
 
 export async function loader({ request }: Route.LoaderArgs) {
+  // dynamically imported to avoid issues with vite externalising dependencies when react-router is in SPA mode (configured with ssr: false)
+  const { loadMdx } = await import("react-router-mdx/server");
   return loadMdx(request)
 }
 
@@ -147,7 +148,7 @@ export default function Route() {
 
   return (
     <section>
-      <h1>{attributes.title}<h1>
+      <h1>{attributes.title}</h1>
       <Component />
     </section>
   )
@@ -161,11 +162,12 @@ If you need to extend the basic features of mdx and use custom [plugins](https:/
 For example let's say you need [remark-gfm](https://github.com/remarkjs/remark-gfm) in your project. Your route loader method will look like the following:
 
 ```ts
-import { loadMdx } from 'react-router-mdx/server'
 import remarkGfm from 'remark-gfm'
 import type { Route } from "./+types/post";
 
 export async function loader({ request }: Route.LoaderArgs) {
-  return loadMdx(request, { remarkPlugins: [remarkGfm] })
+  // dynamically imported to avoid issues with vite externalising dependencies when react-router is in SPA mode (configured with ssr: false)
+  const { loadMdx } = await import("react-router-mdx/server")
+  return loadMdx(request)
 }
 ```
